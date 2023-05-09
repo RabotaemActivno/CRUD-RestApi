@@ -35,11 +35,39 @@ document.getElementById('addTodo').addEventListener('click', async () => {
     todoList.insertAdjacentHTML('beforeend', `
       <div class="form-check" id="todo${id}">
         <label class="form-check-label">
-          <input type="checkbox" class="form-check-input" ${completed ? 'checked' : ''}>
+          <input onchange='toogleCompletedTodo(${id})' type="checkbox" class="form-check-input" ${completed ? 'checked' : ''}>
           ${title}
         </label>
-        <button type="button" class="btn-close" aria-label="Close" style="font-size: 10px;"></button>
+        <button onClick="deleteTodo(${id})" type="button" class="btn-close" aria-label="Close" style="font-size: 10px;"></button>
       </div>
     `);
+  }
+
+  async function deleteTodo (id) {
+    const res = await fetch(`https://jsonplaceholder.typicode.com/todos/${id}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'applicatiion/json',
+        }
+    });
+    const data = await res.json();
+
+    if (data) {
+        document.getElementById(`todo${id}`).remove()
+    }
+  }
+
+  async function toogleCompletedTodo(id) {
+    const completed = document.querySelector(`#todo${id} input`).checked
+
+    const res = await fetch(`https://jsonplaceholder.typicode.com/todos/${id}`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type' : 'application/json'
+        },
+        body: JSON.stringify ({completed})
+    })
+
+    const data = await res.json()
   }
   
